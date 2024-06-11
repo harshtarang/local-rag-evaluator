@@ -1,0 +1,17 @@
+ragas
+
+#Visualization
+seaborn
+matplotlib
+
+# Jupyter
+ipykernel
+ipywidgets
+
+# Embeddings
+fastembed
+gpt4all
+
+pypdf
+unstructured
+unstructured[pdf]
