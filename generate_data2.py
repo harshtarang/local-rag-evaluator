@@ -3,7 +3,7 @@
 ### Deps
 from langchain.document_loaders import DirectoryLoader
 ### Loading
-loader = DirectoryLoader("C:/Users/harsh/Downloads/UF docs/admissions/") # input_path defined in project setup
+loader = DirectoryLoader("C:/Users/harsh/Downloads/UF docs/v3/") # input_path defined in project setup
 documents = loader.load()
 ## Update metadata
 ### Encapsulate
@@ -23,9 +23,10 @@ from ragas.testset.extractor import KeyphraseExtractor
 from ragas.testset.docstore import InMemoryDocumentStore
 
 ### Build
-ragas_llm = ChatOllama(model="mistral")
+mistral = ChatOllama(model="mistral")
+llama3 = ChatOllama(model="llama3:8b")
 embeddings = OllamaEmbeddings(model="mistral")
-keyphrase_extractor = KeyphraseExtractor(llm=ragas_llm)
+keyphrase_extractor = KeyphraseExtractor(llm=mistral)
 splitter = TokenTextSplitter(chunk_size=2500, chunk_overlap=100)
 ## Generate Test Set
 ### Deps
@@ -33,12 +34,13 @@ from ragas.testset.generator import TestsetGenerator
 from ragas.testset.evolutions import simple, reasoning, multi_context
 ### Generate
 generator = TestsetGenerator.from_langchain(
-    generator_llm=ragas_llm,
-    critic_llm=ragas_llm,
+    generator_llm=mistral,
+    critic_llm=llama3,
     embeddings=embeddings,
 )
 
-testset = generator.generate_with_langchain_docs(documents, test_size=10, raise_exceptions=False, with_debugging_logs=True, distributions={simple: 0.5, reasoning: 0.25, multi_context: 0.25})
+testset = generator.generate_with_langchain_docs(documents, test_size=20, raise_exceptions=False, with_debugging_logs=True, distributions={simple: 1.0, reasoning: 0.0, multi_context: 0.0})
 df = testset.to_pandas()
 
-df.to_csv("ground_truth_admissions.csv")
+df.dropna()
+df.to_csv("ground_truth_admissions_v3.csv")
